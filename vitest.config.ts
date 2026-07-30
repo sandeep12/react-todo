@@ -1,16 +1,19 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import { defineConfig, mergeConfig } from 'vitest/config'
+import viteConfig from './vite.config'
 
-// Test-time configuration. Kept separate from vite.config.ts so the app build
-// never pulls in test-only settings.
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],
-    css: true,
-    restoreMocks: true,
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
-  },
-})
+// Vitest reuses the Vite config so tests run through the same transform pipeline.
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./vitest.setup.ts'],
+      include: ['src/**/*.{test,spec}.{ts,tsx}'],
+      css: true,
+      restoreMocks: true,
+      clearMocks: true,
+      passWithNoTests: true,
+    },
+  }),
+)

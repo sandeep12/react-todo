@@ -6,11 +6,13 @@ dist/
 dist-ssr/
 build/
 
-# Test / tooling output
+# Test output
 coverage/
-*.tsbuildinfo
+
+# Caches
 .vite/
-.vitest/
+.cache/
+*.tsbuildinfo
 
 # Logs
 logs/
@@ -20,15 +22,14 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Environment
+# Local env files
 .env
 .env.local
 .env.*.local
 *.local
 
-# Editors / OS
+# Editor / OS
+.DS_Store
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea/
-.DS_Store
-Thumbs.db
