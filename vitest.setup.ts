@@ -2,8 +2,8 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
-// Unmount anything rendered by React Testing Library between tests so that
-// each test starts from a clean DOM.
+// React Testing Library auto-cleans between tests when globals are enabled,
+// but we register it explicitly so the harness is not dependent on that.
 afterEach(() => {
   cleanup()
 })

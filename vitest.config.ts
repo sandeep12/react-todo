@@ -1,23 +1,16 @@
-import { defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
 
-// Reuses the app's Vite config (React plugin, aliases, ...) for tests.
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: ['./vitest.setup.ts'],
-      css: true,
-      include: ['src/**/*.{test,spec}.{ts,tsx}'],
-      restoreMocks: true,
-      coverage: {
-        provider: 'v8',
-        reporter: ['text', 'html'],
-        include: ['src/**/*.{ts,tsx}'],
-        exclude: ['src/**/*.{test,spec}.{ts,tsx}', 'src/main.tsx', 'src/vite-env.d.ts'],
-      },
-    },
-  }),
-)
+// Test-time configuration. Kept separate from vite.config.ts so the app build
+// never pulls in test-only settings.
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
+    css: true,
+    restoreMocks: true,
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+  },
+})

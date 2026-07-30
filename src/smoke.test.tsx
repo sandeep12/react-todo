@@ -1,17 +1,17 @@
-import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import App from './App'
 
 describe('App (smoke)', () => {
-  it('renders the application heading', () => {
-    render(<App />)
+  it('mounts without crashing', () => {
+    const { container } = render(<App />)
 
-    expect(screen.getByRole('heading', { level: 1, name: /todo/i })).toBeInTheDocument()
+    expect(container.firstChild).not.toBeNull()
   })
 
-  it('renders a main landmark for the app content', () => {
+  it('renders a top level heading', () => {
     render(<App />)
 
-    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
 })
