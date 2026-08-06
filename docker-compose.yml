@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB_NAME: todo_app
+    ports:
+      - '3000:3000'
+
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+      args:
+        VITE_API_URL: http://api:3000
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - '4173:4173'
+
+volumes:
+  mongo_data:

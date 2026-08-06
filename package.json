@@ -1,35 +1,21 @@
 {
-  "name": "react-todo-app",
+  "name": "todo-application-with-multi-session-auth",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Mobile-friendly todo application built with React, TypeScript and Vite.",
+  "description": "Todo application monorepo with Express API and React web client.",
   "engines": {
     "node": ">=18.18.0"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig.node.json && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "jsdom": "^25.0.1",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.8"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "start:api": "npm run start -w @todo/api",
+    "start:web": "npm run start -w @todo/web",
+    "dev:api": "npm run dev -w @todo/api",
+    "dev:web": "npm run dev -w @todo/web"
   }
 }

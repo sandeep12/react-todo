@@ -1,12 +1,19 @@
-# Todo App
+# Todo Application Monorepo
 
-A mobile-friendly todo application built with **React 18**, **TypeScript** and **Vite**, tested with
-**Vitest** and **React Testing Library**.
+A mobile-friendly todo application built as an npm workspaces monorepo with separate **API** and **web** deploy tiers.
 
 ## Requirements
 
 - Node.js **18.18** or newer (Node 20 LTS recommended)
-- npm 9 or newer (ships with the Node versions above)
+- npm 9 or newer
+- Docker and Docker Compose (optional, for containerised deployment)
+
+## Packages
+
+| Package | Path | Description |
+| ------- | ---- | ----------- |
+| `@todo/api` | `packages/api` | Express + TypeScript API backed by MongoDB |
+| `@todo/web` | `packages/web` | React 18 + Vite web client |
 
 ## Install
 
@@ -14,67 +21,66 @@ A mobile-friendly todo application built with **React 18**, **TypeScript** and *
 npm install
 ```
 
+Copy `.env.example` to `.env` and adjust values for local development.
+
 ## Commands
 
-| Command            | What it does                                                                 |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `npm run dev`      | Starts the Vite dev server with hot module replacement on <http://localhost:5173> |
-| `npm run build`    | Type-checks the project and emits production assets to `dist/`               |
-| `npm run preview`  | Serves the built `dist/` output locally on <http://localhost:4173>            |
-| `npm test`         | Runs the Vitest + React Testing Library suite once (CI mode)                 |
-| `npm run test:watch` | Runs the test suite in watch mode                                          |
-| `npm run typecheck` | Runs the TypeScript compiler without emitting files                         |
+| Command | What it does |
+| ------- | ------------ |
+| `npm run build` | Builds all workspace packages |
+| `npm test -- --run` | Runs the Vitest suites in every package |
+| `npm run dev:api` | Starts the API in watch mode |
+| `npm run dev:web` | Starts the Vite dev server |
+| `npm run start:api` | Runs the compiled API (`packages/api`) |
+| `npm run start:web` | Serves the built web client (`packages/web`) |
 
-### Develop
+### API (`packages/api`)
 
-```bash
-npm run dev
-```
+Environment variables:
 
-The dev server binds to all interfaces (`host: true`), so the printed network URL can be opened on a
-phone that is on the same Wi-Fi network for real-device testing.
-
-### Build and preview
-
-```bash
-npm run build
-npm run preview
-```
-
-`npm run build` type-checks both the application sources and the config files before Vite writes the
-static bundle to `dist/`. `npm run preview` serves exactly those files so the production output can be
-verified before deploying.
-
-### Test
+| Variable | Description |
+| -------- | ----------- |
+| `PORT` | HTTP port (default `3000`) |
+| `MONGODB_URI` | MongoDB connection string (**required**) |
+| `MONGODB_DB_NAME` | Database name (default `todo_app`) |
 
 ```bash
-npm test
+npm run dev:api
 ```
 
-Tests live next to the code in `src/` and match `*.test.ts`/`*.test.tsx`. The harness is configured in
-`vitest.config.ts` (jsdom environment, globals enabled) and `vitest.setup.ts` (jest-dom matchers plus
-automatic cleanup between tests). A smoke test in `src/smoke.test.tsx` renders the app and asserts the
-root heading is present.
+### Web (`packages/web`)
+
+The web client reads its API base URL from `VITE_API_URL` (see `.env.example`).
+
+```bash
+npm run dev:web
+```
+
+## Deploy tiers
+
+`docker-compose.yml` defines three services:
+
+1. **mongo** — MongoDB database used exclusively by the API tier
+2. **api** — Express API (`depends_on: mongo`)
+3. **web** — static React client served by Vite preview (`depends_on: api`)
+
+Start the full stack:
+
+```bash
+docker compose up --build
+```
+
+- API: <http://localhost:3000/health>
+- Web: <http://localhost:4173>
 
 ## Project structure
 
 ```
 .
-├── index.html          # HTML entry point, viewport meta tag and base layout styles
-├── src/
-│   ├── main.tsx        # Mounts the React root into #root
-│   ├── App.tsx         # Application shell
-│   ├── smoke.test.tsx  # Rendering smoke test
-│   └── vite-env.d.ts   # Vite client type definitions
-├── vite.config.ts      # Vite + React plugin configuration
-├── vitest.config.ts    # Vitest configuration (extends the Vite config)
-└── vitest.setup.ts     # Test setup: jest-dom matchers and cleanup
+├── package.json              # Workspace root
+├── .env.example              # Shared environment template
+├── docker-compose.yml        # api + web deploy tiers
+└── packages/
+    ├── api/                  # Express API (MongoDB)
+    └── web/                  # React + Vite client (VITE_API_URL)
 ```
-
-## Mobile support
-
-- `index.html` declares `<meta name="viewport" content="width=device-width, initial-scale=1" />`.
-- Global styles apply `box-sizing: border-box`, remove default body margins and cap media/controls at
-  `max-width: 100%`, so the layout does not overflow horizontally at a 375px viewport width.
-- The app shell uses a fluid `width: 100%` with `max-width: 40rem`, centring content on wider screens
-  while remaining edge-to-edge on phones.
